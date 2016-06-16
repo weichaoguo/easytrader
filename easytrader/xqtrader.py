@@ -171,12 +171,12 @@ class XueQiuTrader(WebTrader):
                  'money_type': u'人民币',
                  'pre_interest': 0.25}]
 
-    def __get_position(self):
+    def __get_position(self, portfolio):
         """
         获取雪球持仓
         :return:
         """
-        portfolio_code = self.account_config['portfolio_code']  # 组合代码
+        portfolio_code = portfolio  # 组合代码
         portfolio_info = self.__get_portfolio_info(portfolio_code)  # 组合信息
         position = portfolio_info['view_rebalancing']  # 仓位结构
         stocks = position['holdings']  # 持仓股票
@@ -188,12 +188,14 @@ class XueQiuTrader(WebTrader):
             return time.strftime("%Y-%m-%d %H:%M:%S", ltime)
         except :
             return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    def get_position(self):
+    def get_position(self, portfolio=None):
         """
         获取持仓
         :return:
         """
-        xq_positions = self.__get_position()
+        if portfolio == None:
+            portfolio = self.account_config['portfolio_code']
+        xq_positions = self.__get_position(portfolio)
         balance = self.get_balance()[0]
         position_list = []
         for pos in xq_positions:
@@ -313,7 +315,7 @@ class XueQiuTrader(WebTrader):
         weight = round(weight, 2)
 
         # 获取原有仓位信息
-        position_list = self.__get_position()
+        position_list = self.__get_position(self.account_config['portfolio_code'])
 
         # 调整后的持仓
         is_have = False
